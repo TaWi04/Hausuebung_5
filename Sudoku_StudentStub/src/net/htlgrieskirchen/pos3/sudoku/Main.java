@@ -11,12 +11,22 @@ public class Main {
         System.out.println(">--- ORIGINAL ---");
         ss.printSudoku(input);
         System.out.println("SOLVED    = " + ss.checkSudoku(input));
+        System.out.println("SOLVEDP   = " + ss.checkSudokuParallel(ss.sudoku.getSudoku()));
+
         int[][] output = ss.solveSudoku(input);
+        ss.solveSudokuParallel(input);
+        int[][] outputP = ss.sudoku.getSudoku();
+
         System.out.println(">--- SOLUTION ---");
         ss.printSudoku(output);
+        System.out.println(">--- SOLUTIONPARALLEL ---");
+        ss.printSudoku(outputP);
         System.out.println(">----------------");
-        System.out.println("SOLVED    = " + ss.checkSudoku(output)); //ss.checkSudoku(output));
+        System.out.println("SOLVED    = " + ss.checkSudoku(output));
+        System.out.println("SOLVEDP   = " + ss.checkSudokuParallel(output));
         System.out.println(">----------------");
         System.out.println("Benchmark: " + ss.benchmark(input, new File("1_sudoku_level1.csv")) + "ms");
+        System.out.println("BenchmarkP: " + ss.benchmarkParallel(input, new File("1_sudoku_level1.csv")) + "ms");
+
     }
 }

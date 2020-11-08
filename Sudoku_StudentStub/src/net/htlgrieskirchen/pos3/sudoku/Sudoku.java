@@ -9,6 +9,16 @@ package net.htlgrieskirchen.pos3.sudoku;
  *
  * @author Tamara
  */
-public class CallableSudokuChecker {
+public class Sudoku {
+
+    private int[][] sudoku;
+
+    public int[][] getSudoku() {
+        return sudoku;
+    }
+
+    public void setSudoku(int[][] sudoku) {
+        this.sudoku = sudoku;
+    }
 
 }

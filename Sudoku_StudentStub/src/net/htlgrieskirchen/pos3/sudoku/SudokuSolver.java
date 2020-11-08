@@ -3,19 +3,29 @@ package net.htlgrieskirchen.pos3.sudoku;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /* Please enter here an answer to task four between the tags:
- * <answerTask4>
- *    Hier sollte die Antwort auf die Aufgabe 4 stehen.
- * </answerTask4>
+ * <answerTask6>
+ *      aus irgendwelchen Gründen ist die Parallelisierung um einiges langsamer als Singel (meist um die 70 ms unterschied, 
+        ohne die parallelisierung von SudokuSolve waren es nur knapp 10 ms)
+
+ * </answerTask6>
  */
 public class SudokuSolver implements ISodukoSolver {
 
     private static int N = 9;
+    static Sudoku sudoku = new Sudoku();
 
     public SudokuSolver() {
         //initialize if necessary
@@ -53,8 +63,31 @@ public class SudokuSolver implements ISodukoSolver {
         } catch (IOException ex) {
             Logger.getLogger(SudokuSolver.class.getName()).log(Level.SEVERE, null, ex);
         }
+        sudoku.setSudoku(result);
         return result;
 
+    }
+
+    public boolean checkSudokuParallel(int[][] rawSudoku) {
+        ExecutorService executor = Executors.newCachedThreadPool();
+
+        List<Callable<Boolean>> callableList = new ArrayList();
+        callableList.add(new CallableSudokuCheckerCol(rawSudoku));
+        callableList.add(new CallableSudokuCheckerGrid(rawSudoku));
+        callableList.add(new CallableSudokuCheckerRow(rawSudoku));
+        boolean[] temp = new boolean[3];
+        int i = 0;
+        try {
+            for (Future<Boolean> future : executor.invokeAll(callableList)) {
+                temp[i] = future.get();
+                i++;
+            }
+        } catch (InterruptedException | ExecutionException ex) {
+            Logger.getLogger(SudokuSolver.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        executor.shutdown();
+        return temp[0] == true && temp[1] == true && temp[2] == true;
     }
 
     @Override
@@ -93,7 +126,6 @@ public class SudokuSolver implements ISodukoSolver {
         return true;
     }
 
-    //
     @Override
     public int[][] solveSudoku(int[][] rawSudoku) {
         solveSuduko(rawSudoku, 0, 0);
@@ -102,8 +134,22 @@ public class SudokuSolver implements ISodukoSolver {
 
     @Override
     public int[][] solveSudokuParallel(int[][] rawSudoku) {
-        // implement this method
-        return new int[0][0]; // delete this line!
+        ExecutorService executor = Executors.newCachedThreadPool();
+
+        List<Callable<Boolean>> callableList = new ArrayList();
+        for (int i = 0; i < 9; i++) {
+            callableList.add(new CallableSudokuSolver(sudoku, i, 0));
+        }
+        int[][] temp = new int[9][9];
+
+        try {
+            executor.invokeAll(callableList);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(SudokuSolver.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        executor.shutdown();
+        return temp;
     }
 
     // add helper methods here if necessary
@@ -165,13 +211,14 @@ public class SudokuSolver implements ISodukoSolver {
 
             if (isSafe(grid, row, col, num)) {
                 grid[row][col] = num;
-
+                sudoku.setSudoku(grid);
                 if (solveSuduko(grid, row, col + 1)) {
                     return true;
                 }
             }
 
             grid[row][col] = 0;
+            sudoku.setSudoku(grid);
         }
         return false;
     }
@@ -217,6 +264,17 @@ public class SudokuSolver implements ISodukoSolver {
         for (int i = 0; i < 10; i++) {
             readSudoku(file);
             checkSudoku(rawSudoku);
+            solveSudoku(rawSudoku);
+        }
+        long end = System.currentTimeMillis();
+        return end - start;
+    }
+
+    public long benchmarkParallel(int[][] rawSudoku, File file) {
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < 10; i++) {
+            readSudoku(file);
+            checkSudokuParallel(rawSudoku);
             solveSudoku(rawSudoku);
         }
         long end = System.currentTimeMillis();
