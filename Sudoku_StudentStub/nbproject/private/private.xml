@@ -5,7 +5,12 @@
         <group>
             <file>file:/D:/Daten/Tamara%20Schule/Pos/Hausuebung_5/Sudoku_StudentStub/src/net/htlgrieskirchen/pos3/sudoku/Main.java</file>
             <file>file:/D:/Daten/Tamara%20Schule/Pos/Hausuebung_5/Sudoku_StudentStub/src/net/htlgrieskirchen/pos3/sudoku/SudokuSolver.java</file>
+            <file>file:/D:/Daten/Tamara%20Schule/Pos/Hausuebung_5/Sudoku_StudentStub/src/net/htlgrieskirchen/pos3/sudoku/CallableSudokuCheckerRow.java</file>
+            <file>file:/D:/Daten/Tamara%20Schule/Pos/Hausuebung_5/Sudoku_StudentStub/src/net/htlgrieskirchen/pos3/sudoku/Sudoku.java</file>
             <file>file:/D:/Daten/Tamara%20Schule/Pos/Hausuebung_5/Sudoku_StudentStub/src/net/htlgrieskirchen/pos3/sudoku/ISodukoSolver.java</file>
+            <file>file:/D:/Daten/Tamara%20Schule/Pos/Hausuebung_5/Sudoku_StudentStub/src/net/htlgrieskirchen/pos3/sudoku/CallableSudokuCheckerCol.java</file>
+            <file>file:/D:/Daten/Tamara%20Schule/Pos/Hausuebung_5/Sudoku_StudentStub/src/net/htlgrieskirchen/pos3/sudoku/CallableSudokuCheckerGrid.java</file>
+            <file>file:/D:/Daten/Tamara%20Schule/Pos/Hausuebung_5/Sudoku_StudentStub/src/net/htlgrieskirchen/pos3/sudoku/CallableSudokuSolver.java</file>
         </group>
     </open-files>
 </project-private>

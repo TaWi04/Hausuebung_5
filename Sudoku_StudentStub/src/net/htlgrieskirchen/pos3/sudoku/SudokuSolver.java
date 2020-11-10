@@ -17,9 +17,8 @@ import java.util.logging.Logger;
 
 /* Please enter here an answer to task four between the tags:
  * <answerTask6>
- *      aus irgendwelchen Gründen ist die Parallelisierung um einiges langsamer als Singel (meist um die 70 ms unterschied, 
-        ohne die parallelisierung von SudokuSolve waren es nur knapp 10 ms)
-
+ *      aus irgendwelchen Gründen ist die Parallelisierung langsamer als Singel (meist um das 30 ms mehr, dies dürfte am SolveParallel liegen)
+        //update es funktioniert garnicht mehr :(
  * </answerTask6>
  */
 public class SudokuSolver implements ISodukoSolver {
@@ -132,7 +131,7 @@ public class SudokuSolver implements ISodukoSolver {
         return rawSudoku;
     }
 
-    @Override
+    @Override // not really parallel :/
     public int[][] solveSudokuParallel(int[][] rawSudoku) {
         ExecutorService executor = Executors.newCachedThreadPool();
 
@@ -153,45 +152,6 @@ public class SudokuSolver implements ISodukoSolver {
     }
 
     // add helper methods here if necessary
-    public String getRowSeparator(String sep) { // method which prints a line
-        StringBuilder separator = new StringBuilder();
-        separator.append('\n');
-
-        for (int i = 0; i <= 9; i++) {
-            separator.append(sep);
-        }
-        separator.append('\n');
-
-        return separator.toString();
-    }
-
-    static boolean isSafe(int[][] rawSudoku, int row, int col, int num) {
-
-        for (int x = 0; x <= 8; x++) {
-            if (rawSudoku[row][x] == num) {
-                return false;
-            }
-        }
-
-        for (int x = 0; x <= 8; x++) {
-            if (rawSudoku[x][col] == num) {
-                return false;
-            }
-        }
-
-        int startRow = row - row % 3, startCol
-                = col - col % 3;
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (rawSudoku[i + startRow][j + startCol] == num) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
     static boolean solveSuduko(int grid[][], int row,
             int col) {
 
@@ -223,6 +183,33 @@ public class SudokuSolver implements ISodukoSolver {
         return false;
     }
 
+    static boolean isSafe(int[][] rawSudoku, int row, int col, int num) {
+
+        for (int x = 0; x <= 8; x++) { // check rows
+            if (rawSudoku[row][x] == num) {
+                return false;
+            }
+        }
+
+        for (int x = 0; x <= 8; x++) { // check col
+            if (rawSudoku[x][col] == num) {
+                return false;
+            }
+        }
+
+        int startRow = row - row % 3;// check grid
+        int startCol = col - col % 3;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (rawSudoku[i + startRow][j + startCol] == num) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     public String printSudoku(int[][] input) {
         int count_row = 1;
         int count_col = 1;
@@ -244,14 +231,12 @@ public class SudokuSolver implements ISodukoSolver {
                     System.out.print(input[k][l] + temp);
                 }
             }
-            //System.out.println("");
             if (count_col == 3) {
                 temp = getRowSeparator("____");
                 temp = (String) temp.subSequence(0, temp.length() - 6);
                 count_col = 1;
             } else {
                 temp = "";
-                //temp = ss.getRowSeparator("");
                 count_col++;
             }
             System.out.println(temp);
@@ -262,7 +247,7 @@ public class SudokuSolver implements ISodukoSolver {
     public long benchmark(int[][] rawSudoku, File file) {
         long start = System.currentTimeMillis();
         for (int i = 0; i < 10; i++) {
-            readSudoku(file);
+            //readSudoku(file);
             checkSudoku(rawSudoku);
             solveSudoku(rawSudoku);
         }
@@ -270,15 +255,27 @@ public class SudokuSolver implements ISodukoSolver {
         return end - start;
     }
 
+    public String getRowSeparator(String sep) { // method which prints a line
+        StringBuilder separator = new StringBuilder();
+        separator.append('\n');
+
+        for (int i = 0; i <= 9; i++) {
+            separator.append(sep);
+        }
+        separator.append('\n');
+
+        return separator.toString();
+    }
+
+    /*
     public long benchmarkParallel(int[][] rawSudoku, File file) {
         long start = System.currentTimeMillis();
         for (int i = 0; i < 10; i++) {
-            readSudoku(file);
+            //readSudoku(file);
             checkSudokuParallel(rawSudoku);
-            solveSudoku(rawSudoku);
+            solveSudokuParallel(rawSudoku);
         }
         long end = System.currentTimeMillis();
         return end - start;
-    }
-
+    }*/
 }
